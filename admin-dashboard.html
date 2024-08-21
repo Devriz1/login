@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="admin-dashboard.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <h1>Admin Dashboard</h1>
+        <div class="upload-section">
+            <h2>Upload Images</h2>
+            <input type="file" id="imageUpload" accept="image/*" multiple>
+            <button id="uploadButton">Upload</button>
+            <button id="doneButton">Done</button>
+        </div>
+
+        <div class="image-list">
+            <h2>Manage Images</h2>
+            <div id="imagesContainer"></div>
+        </div>
+    </div>
+
+    <script src="admin-dashboard.js"></script>
+</body>
+</html>
