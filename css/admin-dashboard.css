@@ -10,7 +10,7 @@ body {
 }
 
 .dashboard-container {
-    width: 80%;
+    width: 90%;
     max-width: 1200px;
     max-height: 90vh;
     background: white;
@@ -26,10 +26,13 @@ h1, h2 {
 
 .upload-section {
     margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 input[type="file"] {
-    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 button {
@@ -39,6 +42,9 @@ button {
     background-color: #007bff;
     color: white;
     cursor: pointer;
+    margin-top: 10px;
+    font-size: 1rem;
+    transition: background-color 0.3s;
 }
 
 button:hover {
@@ -61,6 +67,11 @@ button:hover {
     background: #fafafa;
     border-radius: 8px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s;
+}
+
+.image-item:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .image-item img {
@@ -77,12 +88,16 @@ button:hover {
     color: white;
     border: none;
     border-radius: 4px;
-    padding: 5px 10px;
+    padding: 8px 12px;
     cursor: pointer;
+    font-size: 0.75rem;
+    transition: background-color 0.3s, transform 0.2s;
+    z-index: 10;
 }
 
 .image-item button:hover {
     background-color: #c82333;
+    transform: scale(1.05);
 }
 
 /* Media Queries */
@@ -94,15 +109,16 @@ button:hover {
     }
     
     #imagesContainer {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
 
     .image-item {
-        height: 150px; /* Adjust height as needed */
+        height: auto;
     }
 
     .image-item button {
-        padding: 3px 7px;
+        padding: 6px 10px;
+        font-size: 0.7rem;
     }
 }
 
@@ -119,23 +135,25 @@ button:hover {
     }
 
     input[type="file"] {
-        margin-bottom: 10px;
         width: 100%;
     }
 
     button {
         width: 100%;
+        padding: 12px;
+        box-sizing: border-box;
     }
 
     #imagesContainer {
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
 
     .image-item {
-        height: 120px; /* Adjust height as needed */
+        height: auto;
     }
 
     .image-item button {
-        padding: 2px 5px;
+        padding: 5px 8px;
+        font-size: 0.6rem;
     }
 }
