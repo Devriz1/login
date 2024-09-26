@@ -58,29 +58,11 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // Function to finalize upload
-    function finalizeUpload() {
-        if (images.length === 0) {
-            alert('No images to finalize.');
-            return;
-        }
-
-        fetch('finalize_upload.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ images: images })
-        })
-        .then(response => response.text())
-        .then(result => {
-            alert(result);
-            // Optionally clear the images array and container
-            images = [];
-            displayImages();
-        })
-        .catch(error => {
-            console.error('Error finalizing upload:', error);
-            alert('Failed to finalize upload.');
-        });
-    }
+   // Inside finalizeUpload function
+fetch('finalize_upload.php', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ images: images })
 });
