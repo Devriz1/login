@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     message: `Upload ${img.name}`,
                     content: base64Data,
-                    branch: 'main' // Replace with your branch if different
+                    branch: 'master' // Replace with your branch if different
                 })
             })
             .then(response => {
