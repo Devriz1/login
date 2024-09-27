@@ -58,22 +58,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to finalize upload
     function finalizeUpload() {
-        fetch('finalize_upload.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ images: images })
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert('Upload finalized successfully!');
-            images = []; // Clear the image list
-            displayImages(); // Refresh the display
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while finalizing the upload.');
+        const username = 'devriz1'; // Replace with your GitHub username
+        const repo = 'login'; // Replace with your repository name
+        const path = 'login/images/'; // Folder in the repo where you want to upload images
+        const token = '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'; // Use your GitHub personal access token
+
+        images.forEach((img) => {
+            const fileName = `${path}${img.name}`;
+            const base64Data = img.url.split(',')[1]; // Extract base64 string
+
+            fetch(`https://api.github.com/repos/${username}/${repo}/contents/${fileName}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Upload ${img.name}`,
+                    content: base64Data,
+                    branch: 'main' // Replace with your branch if different
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to upload image: ' + response.statusText);
+                }
+            })
+            .then(data => {
+                console.log('Image uploaded:', data);
+                alert(`Successfully uploaded: ${img.name}`);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while uploading: ' + img.name);
+            });
         });
     }
 });
