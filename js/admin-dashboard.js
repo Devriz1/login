@@ -1,4 +1,3 @@
-// scripts.js
 document.addEventListener('DOMContentLoaded', function() {
     const uploadButton = document.getElementById('uploadButton');
     const doneButton = document.getElementById('doneButton');
@@ -58,11 +57,23 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // Function to finalize upload
-   // Inside finalizeUpload function
-fetch('finalize_upload.php', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ images: images })
+    function finalizeUpload() {
+        fetch('finalize_upload.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ images: images })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Upload finalized successfully!');
+            images = []; // Clear the image list
+            displayImages(); // Refresh the display
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while finalizing the upload.');
+        });
+    }
 });
