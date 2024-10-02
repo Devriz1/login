@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const fileName = `images/${img.name}`; // Path in the repo
             const base64Data = img.url.split(',')[1]; // Extract base64 string
 
-            fetch(`https://api.github.com/repos/${devriz1}/${login}/contents/${images}`, {
+            fetch(`https://api.github.com/repos/$devriz1/$login/$images`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `token ${token}`,
