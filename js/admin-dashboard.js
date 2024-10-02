@@ -58,16 +58,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to finalize upload
     function finalizeUpload() {
-        const username = 'devriz1'; // Replace with your GitHub username
-        const repo = 'login'; // Replace with your repository name
-        const path = 'login/images/'; // Folder in the repo where you want to upload images
-        const token = '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'; // Use your GitHub personal access token
+        const username = 'devriz1'; // Your GitHub username
+        const repo = 'login'; // Your repository name
+        const branch = 'master'; // Your target branch
+        const token = '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'; // Your GitHub Personal Access Token
 
         images.forEach((img) => {
-            const fileName = `${path}${img.name}`;
+            const fileName = `images/${img.name}`; // Path in the repo
             const base64Data = img.url.split(',')[1]; // Extract base64 string
 
-            fetch(`https://api.github.com/repos/${username}/${repo}/contents/${fileName}`, {
+            fetch(`https://api.github.com/repos/${devriz1}/${login}/contents/${images}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `token ${token}`,
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     message: `Upload ${img.name}`,
                     content: base64Data,
-                    branch: 'master' // Replace with your branch if different
+                    branch: branch
                 })
             })
             .then(response => {
