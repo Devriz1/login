@@ -1,4 +1,4 @@
-const VALID_USERNAME = 'Risal';
+const VALID_USERNAME = 'admin';
 const VALID_PASSWORD = '123';
 
 document.getElementById('loginForm').addEventListener('submit', function(event) {
