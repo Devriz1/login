@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const repoOwner = 'devriz1'; // Your GitHub username
     const repoName = 'login'; // The repository to which you want to upload
 
+    let selectedFiles = []; // Array to hold selected files for upload
+
     // Handle the upload button click
     uploadButton.addEventListener('click', function() {
         const files = imageUpload.files;
@@ -19,8 +21,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Clear previous images
         imagesContainer.innerHTML = '';
+        selectedFiles = []; // Reset the selected files array
 
-        // Create previews for each selected image and upload them to GitHub
+        // Create previews for each selected image
         Array.from(files).forEach(file => {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -54,45 +57,19 @@ document.addEventListener("DOMContentLoaded", function() {
                 // Add event listener for the remove button
                 removeButton.addEventListener('click', function() {
                     imgContainer.remove(); // Remove the image container
+                    selectedFiles = selectedFiles.filter(f => f.name !== file.name); // Remove from selected files
                 });
 
                 // Append image and button to the container
                 imgContainer.appendChild(img);
                 imgContainer.appendChild(removeButton);
                 imagesContainer.appendChild(imgContainer);
+                
+                // Add the file to the selected files array
+                selectedFiles.push(file);
             };
 
             reader.readAsDataURL(file);
-
-            // Upload image to GitHub
-            const base64Data = btoa(e.target.result.split(',')[1]);
-            const filePath = `images/${file.name}`; // Adjust path as needed
-
-            fetch(`https://api.github.com/repos/${devriz1}/${login}/contents/${images}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${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}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: `Upload ${file.name}`,
-                    content: base64Data
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to upload image');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Uploaded file:', data);
-                alert('Uploaded: ' + file.name + ' - Link: ' + data.content.html_url);
-            })
-            .catch(error => {
-                console.error('Error uploading:', error);
-                alert('Upload failed: ' + error.message);
-            });
         });
 
         // Reset the file input to default
@@ -101,7 +78,52 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Handle the done button click
     doneButton.addEventListener('click', function() {
-        alert("Upload process completed.");
+        if (selectedFiles.length === 0) {
+            alert("No images to upload.");
+            return;
+        }
+
+        // Upload each selected file to GitHub
+        selectedFiles.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = btoa(e.target.result.split(',')[1]);
+                const filePath = `/login/images`; // Specify the folder path
+
+                fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${githubToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Upload ${file.name}`,
+                        content: base64Data
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to upload image');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Uploaded file:', data);
+                    alert('Uploaded: ' + file.name + ' - Link: ' + data.content.html_url);
+                })
+                .catch(error => {
+                    console.error('Error uploading:', error);
+                    alert('Upload failed: ' + error.message);
+                });
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        // Clear the selected files after uploading
+        selectedFiles = []; // Clear the array
         imagesContainer.innerHTML = ''; // Clear previews
+        imageUpload.value = ''; // Clear the file input
+        alert("Upload process completed.");
     });
 });
