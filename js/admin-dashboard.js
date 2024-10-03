@@ -1,112 +1,107 @@
-document.addEventListener('DOMContentLoaded', function() {
+// Wait for the DOM to load
+document.addEventListener("DOMContentLoaded", function() {
+    const imageUpload = document.getElementById('imageUpload');
     const uploadButton = document.getElementById('uploadButton');
     const doneButton = document.getElementById('doneButton');
-    const imageUpload = document.getElementById('imageUpload');
     const imagesContainer = document.getElementById('imagesContainer');
 
-    let images = []; // Array to store image data
+    const githubToken = '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'; // Replace with your token
+    const repoOwner = 'devriz1'; // Your GitHub username
+    const repoName = 'login'; // The repository to which you want to upload
 
-    // Initialize MEGA Storage
-    const storage = new mega.Storage({
-        email: 'mohammedrisal65@gmail.com',  // Replace with your email
-        password: 'Sainudheen@01'          // Replace with your password
+    // Handle the upload button click
+    uploadButton.addEventListener('click', function() {
+        const files = imageUpload.files;
+        if (files.length === 0) {
+            alert("Please select images to upload.");
+            return;
+        }
+
+        // Clear previous images
+        imagesContainer.innerHTML = '';
+
+        // Create previews for each selected image and upload them to GitHub
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Create a container for the image
+                const imgContainer = document.createElement('div');
+                imgContainer.style.display = 'flex';
+                imgContainer.style.flexDirection = 'column'; // Stack image and button vertically
+                imgContainer.style.alignItems = 'center';
+                imgContainer.style.margin = '5px';
+
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = file.name;
+                img.style.maxWidth = '100px'; // Set max width for the preview
+                img.style.maxHeight = '100px'; // Set max height for the preview
+                img.style.objectFit = 'cover'; // Preserve aspect ratio and fill the area
+                img.style.borderRadius = '10px'; // Rounded corners
+
+                // Create a remove button
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'Remove';
+                removeButton.style.backgroundColor = '#ff4d4d';
+                removeButton.style.color = '#fff';
+                removeButton.style.border = 'none';
+                removeButton.style.padding = '5px 10px';
+                removeButton.style.cursor = 'pointer';
+                removeButton.style.borderRadius = '4px';
+                removeButton.style.position = 'relative'; // Position relative to float below image
+                removeButton.style.marginTop = '5px'; // Space between image and button
+
+                // Add event listener for the remove button
+                removeButton.addEventListener('click', function() {
+                    imgContainer.remove(); // Remove the image container
+                });
+
+                // Append image and button to the container
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(removeButton);
+                imagesContainer.appendChild(imgContainer);
+            };
+
+            reader.readAsDataURL(file);
+
+            // Upload image to GitHub
+            const base64Data = btoa(e.target.result.split(',')[1]);
+            const filePath = `images/${file.name}`; // Adjust path as needed
+
+            fetch(`https://api.github.com/repos/${devriz1}/${login}/contents/${images}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${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}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Upload ${file.name}`,
+                    content: base64Data
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to upload image');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Uploaded file:', data);
+                alert('Uploaded: ' + file.name + ' - Link: ' + data.content.html_url);
+            })
+            .catch(error => {
+                console.error('Error uploading:', error);
+                alert('Upload failed: ' + error.message);
+            });
+        });
+
+        // Reset the file input to default
+        imageUpload.value = ''; // Clear the file input
     });
 
-    // Wait for the storage object to be ready
-    storage.ready.then(() => {
-        console.log('MEGA storage is ready.');
-
-        // Handle image upload
-        uploadButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            const files = imageUpload.files;
-            if (files.length > 0) {
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const imgData = {
-                            url: e.target.result,
-                            name: file.name,
-                            type: file.type
-                        };
-                        images.push(imgData);
-                        displayImages();
-                    };
-                    reader.readAsDataURL(file);
-                }
-                imageUpload.value = ''; // Clear the file input
-            } else {
-                alert('Please select at least one image file to upload.');
-            }
-        });
-
-        // Function to display images
-        function displayImages() {
-            imagesContainer.innerHTML = '';
-            images.forEach((img, index) => {
-                const imageItem = document.createElement('div');
-                imageItem.classList.add('image-item');
-                imageItem.innerHTML = `
-                    <img src="${img.url}" alt="${img.name}">
-                    <button onclick="deleteImage(${index})">Delete</button>
-                `;
-                imagesContainer.appendChild(imageItem);
-            });
-        }
-
-        // Function to delete an image
-        window.deleteImage = function(index) {
-            if (confirm('Are you sure you want to delete this image?')) {
-                images.splice(index, 1);
-                displayImages();
-            }
-        };
-
-        // Function to finalize upload
-        function finalizeUpload() {
-            if (images.length === 0) {
-                alert('No images to upload.');
-                return;
-            }
-
-            const uploadPromises = images.map((img) => {
-                // Convert base64 to Blob
-                const byteString = atob(img.url.split(',')[1]);
-                const mimeString = img.type;
-                const ab = new Uint8Array(byteString.length);
-                for (let i = 0; i < byteString.length; i++) {
-                    ab[i] = byteString.charCodeAt(i);
-                }
-                const fileBlob = new Blob([ab], { type: mimeString });
-                
-                // Upload the Blob as a file
-                return storage.upload(fileBlob, img.name).then((uploadResponse) => {
-                    console.log('Image uploaded:', uploadResponse);
-                    return `Successfully uploaded: ${img.name}`;
-                }).catch((error) => {
-                    console.error('Error during upload:', error);
-                    throw new Error('Failed to upload: ' + img.name);
-                });
-            });
-
-            // Handle upload results
-            Promise.all(uploadPromises)
-                .then(results => {
-                    alert(results.join('\n'));
-                })
-                .catch(err => {
-                    alert(err.message);
-                });
-        }
-
-        // Handle Done button click
-        doneButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            finalizeUpload();
-        });
-    }).catch((error) => {
-        console.error('Error initializing MEGA storage:', error);
-        alert('An error occurred while initializing MEGA storage');
+    // Handle the done button click
+    doneButton.addEventListener('click', function() {
+        alert("Upload process completed.");
+        imagesContainer.innerHTML = ''; // Clear previews
     });
 });
