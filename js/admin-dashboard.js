@@ -8,12 +8,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize MEGA Storage
     const storage = new mega.Storage({
-        email: risalrichu01@gmail.com  // Replace with your email
-        password: Sainudheen@01          // Replace with your password
+        email: 'mohammedrisal65@gmail.com',  // Replace with your email
+        password: 'Sainudheen@01'          // Replace with your password
     });
 
     // Wait for the storage object to be ready
     storage.ready.then(() => {
+        console.log('MEGA storage is ready.');
+
         // Handle image upload
         uploadButton.addEventListener('click', function(event) {
             event.preventDefault();
@@ -63,7 +65,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Function to finalize upload
         function finalizeUpload() {
-            images.forEach((img) => {
+            if (images.length === 0) {
+                alert('No images to upload.');
+                return;
+            }
+
+            const uploadPromises = images.map((img) => {
                 // Convert base64 to Blob
                 const byteString = atob(img.url.split(',')[1]);
                 const mimeString = img.type;
@@ -74,14 +81,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 const fileBlob = new Blob([ab], { type: mimeString });
                 
                 // Upload the Blob as a file
-                storage.upload(fileBlob, img.name).then((uploadResponse) => {
+                return storage.upload(fileBlob, img.name).then((uploadResponse) => {
                     console.log('Image uploaded:', uploadResponse);
-                    alert(`Successfully uploaded: ${img.name}`);
+                    return `Successfully uploaded: ${img.name}`;
                 }).catch((error) => {
-                    console.error('Error:', error);
-                    alert('An error occurred while uploading: ' + img.name);
+                    console.error('Error during upload:', error);
+                    throw new Error('Failed to upload: ' + img.name);
                 });
             });
+
+            // Handle upload results
+            Promise.all(uploadPromises)
+                .then(results => {
+                    alert(results.join('\n'));
+                })
+                .catch(err => {
+                    alert(err.message);
+                });
         }
 
         // Handle Done button click
@@ -90,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
             finalizeUpload();
         });
     }).catch((error) => {
-        console.error('Error:', error);
+        console.error('Error initializing MEGA storage:', error);
         alert('An error occurred while initializing MEGA storage');
     });
 });
