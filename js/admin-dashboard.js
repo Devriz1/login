@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Wait for the storage object to be ready
   storage.ready.then(() => {
     // Handle image upload
-    uploadButton.addEventListener('click', function() {
+    uploadButton.addEventListener('click', function(event) {
+      event.preventDefault();
       const files = imageUpload.files;
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
@@ -80,7 +81,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Handle Done button click
-    doneButton.addEventListener('click', function() {
+    doneButton.addEventListener('click', function(event) {
+      event.preventDefault();
       finalizeUpload();
     });
   }).catch((error) => {
